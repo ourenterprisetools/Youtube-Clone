@@ -19,7 +19,21 @@
     <meta name="author" content="Nome do autor" />
     <meta property="og:image" content="URL_DA_IMAGEM.html" />
     <title>[LIVE]</title>
-    <script src="js/player.js" async=""></script>
+
+    <link
+      rel="preload"
+      href="https://scripts.converteai.net/dc2bee22-f6b3-41ae-b28c-3a61aaac8be4/ab-test/68200d9065dc0f433d443f33/player.js"
+      as="script"
+    />
+    <link
+      rel="preload"
+      href="https://scripts.converteai.net/lib/js/smartplayer/v1/smartplayer.min.js"
+      as="script"
+    />
+    <link rel="dns-prefetch" href="https://cdn.converteai.net" />
+    <link rel="dns-prefetch" href="https://scripts.converteai.net" />
+    <link rel="dns-prefetch" href="https://images.converteai.net" />
+    <link rel="dns-prefetch" href="https://api.vturb.com.br" />
   </head>
   <body>
     <header>
@@ -48,16 +62,6 @@
 
     <main class="container" id="app">
       <div class="area-video" style="position: relative">
-        <div
-          style="
-            position: absolute;
-            z-index: 999999;
-            width: 100%;
-            top: 0;
-            left: 0;
-          "
-        ></div>
-
         <script type="text/javascript" id="scr_68200d9065dc0f433d443f33">
           var s = document.createElement("script");
           (s.src =
@@ -65,8 +69,6 @@
             (s.async = !0),
             document.head.appendChild(s);
         </script>
-
-        <div class="area_btn" :style="{ display: btnDisplay }"></div>
 
         <h1>
           UMA SÉRIE DE MUDANÇAS NAS OFERTAS ONDE VOCÊ CONSEGUE
