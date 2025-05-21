@@ -78,6 +78,17 @@
         <div class="assistindo" bis_skin_checked="1">
           <img src="images/gif_ao_vivo.gif" alt="ao vivo" />
           <p><span id="contador">{{contador}}</span> watching now</p>
+          <script>
+            let contador = 730;
+
+            function atualizarContador() {
+              contador = Math.floor(Math.random() * (1033 - 730 + 1)) + 730;
+              document.getElementById("contador").textContent = contador;
+            }
+
+            setInterval(atualizarContador, 3000); // Atualiza o contador a cada 3 segundos
+            document.getElementById("contador").textContent = contador; // Inicializa o contador
+          </script>
         </div>
 
         <div class="area_user">
@@ -127,7 +138,7 @@
         </div>
       </div>
       <aside>
-        <div class="chat" id="app">
+        <!-- <div class="chat" id="app">
           <div class="header-chat">
             <h2>Main messages</h2>
             <svg
@@ -175,7 +186,7 @@
           <div class="button" @click="toggleContent">
             {{ showContent ? 'Hide chat' : 'Show chat' }}
           </div>
-        </div>
+        </div> -->
       </aside>
     </main>
 
@@ -197,6 +208,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
-    <script src="js/main.js"></script>
+    <!-- <script src="js/main.js"></script> -->
   </body>
 </html>
