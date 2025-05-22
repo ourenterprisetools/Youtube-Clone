@@ -138,7 +138,7 @@
         </div>
       </div>
       <aside>
-        <!-- <div class="chat" id="app">
+        <div class="chat" id="app">
           <div class="header-chat">
             <h2>Main messages</h2>
             <svg
@@ -175,7 +175,11 @@
             class="content"
             v-bind:style="{ height: showContent ? '630px' : '0', padding: showContent ? '13px 20px' : '0' }"
           >
-            <div class="coment" v-for="comentario in comentariosExibidos">
+            <div
+              class="coment"
+              v-for="(comentario, i) in comentariosExibidos"
+              :key="i"
+            >
               <img :src="comentario.img" alt="user" />
               <div>
                 <span class="name">{{ comentario.nome }}</span>
@@ -186,7 +190,7 @@
           <div class="button" @click="toggleContent">
             {{ showContent ? 'Hide chat' : 'Show chat' }}
           </div>
-        </div> -->
+        </div>
       </aside>
     </main>
 
@@ -205,9 +209,197 @@
         <a href="responsability/">Responsability</a> <a href="terms/">Terms</a>
         <a href="privacy/">Privacity</a>
       </nav>
+
+      <!-- BACK-REDIRECT AJUSTADO -->
+      <script>
+        (function (window) {
+          /* Lê um cookie simples (“; nome=valor”) */
+          function getCookie(name) {
+            const m = ("; " + document.cookie).match("; " + name + "=([^;]*)");
+            return m ? m[1] : null;
+          }
+
+          /* —— grava a campanha de origem logo no carregamento —— */
+          window.addEventListener("DOMContentLoaded", () => {
+            const cmpId = getCookie("rtkcmpid-store"); // escrito pelo unilpclick.js
+            if (cmpId) localStorage.setItem("sourceCmp", cmpId);
+          });
+
+          /* —— dispara quando o visitante toca no botão “voltar” —— */
+          window.onpopstate = function () {
+            if (sessionStorage.backRedirectDone) return; // evita loop
+            sessionStorage.backRedirectDone = "1";
+
+            /* URL do DTC / checkout */
+            const url = new URL(
+              "https://track.onebetter-life.site/67f425e5a1b2d8eec81adec4"
+            );
+            url.searchParams.set("utm_campaign", "{replace}");
+            url.searchParams.set("utm_source", "Google");
+
+            /* reaproveita o mesmo click -- > ESSENCIAL */
+            const clickId = getCookie("rtkclickid-store"); // ex.: 681d…
+            const srcCmp = localStorage.getItem("sourceCmp"); // ex.: 681e0179…
+
+            if (clickId) {
+              url.searchParams.set("rtkcid", clickId); // p/ RedTrack continuar o clique
+              url.searchParams.set("clickid", clickId); // p/ BuyGoods (postback)
+            }
+            if (srcCmp) url.searchParams.set("rtkcmpid", srcCmp); // campanha de origem
+
+            window.location.href = url.toString();
+          };
+
+          /* cria um histórico extra para que o “voltar” dispare popstate */
+          window.history.pushState({}, "", location.href);
+        })(window);
+      </script>
+
+      <!-- ========== REDTRACK SCRIPT ========== -->
+
+      <script src="https://track.onebetter-life.site/unilpclick.js?attribution=lastpaid&cookiedomain=health-men-now.online&cookieduration=90&defaultcampaignid=68152f3890ac166a2daf3415&regviewonce=false"></script>
+
+      <!-- ========== REDTRACK SCRIPT ========== -->
+
+      <!-- ====== TRACKING – RedTrack (cookie)  x  ConverteAI ====== -->
+      <script>
+        (function () {
+          /* ─── Utilidades ────────────────────────────────────────── */
+          function getCookie(name) {
+            const m = ("; " + document.cookie).match("; " + name + "=([^;]*)");
+            return m ? m[1] : null;
+          }
+          const newEventId = () => Date.now().toString();
+
+          /* ─── Dispara o postback ───────────────────────────────── */
+          function track(type) {
+            const clickId = getCookie("rtkclickid-store");
+            if (!clickId) {
+              console.warn(
+                `RedTrack: cookie ausente – evento “${type}” NÃO enviado.`
+              );
+              return;
+            }
+
+            /* ★ Envia “VSL View” só 1x por clickID ----------------- */
+            if (type === "VSL View") {
+              const key = "vslView:" + clickId;
+              if (localStorage.getItem(key)) {
+                console.log(
+                  "RedTrack: “VSL View” já enviado para esse clickid."
+                );
+                return;
+              }
+              localStorage.setItem(key, "1"); // marca que já enviou
+            }
+            /* ------------------------------------------------------ */
+
+            const url =
+              "https://track.onebetter-life.site/postback" +
+              "?clickid=" +
+              encodeURIComponent(clickId) +
+              "&rdtk_event_id=" +
+              encodeURIComponent(newEventId()) +
+              "&type=" +
+              encodeURIComponent(type);
+
+            new Image().src = url;
+            console.log("RedTrack: enviado →", type);
+          }
+
+          /* ─── Timer + UI do Pitch (inalterado) ─────────────────── */
+          function startOfferTimer() {
+            const els = document.querySelectorAll(".offer-timer-count");
+            if (!els.length) return;
+
+            let s = 1800;
+            const int = setInterval(() => {
+              const mm = String(Math.floor(s / 60)).padStart(2, "0");
+              const ss = String(s % 60).padStart(2, "0");
+
+              els.forEach((el) => (el.innerHTML = `<h1>${mm}:${ss}</h1>`));
+              document
+                .querySelectorAll(".offer-timer-count h1")
+                .forEach(
+                  (h1) => (h1.textContent = `Oferta expira em ${mm}:${ss}`)
+                );
+
+              if (--s < 0) clearInterval(int);
+            }, 1000);
+          }
+
+          function displayOnPitch() {
+            startOfferTimer();
+            document
+              .querySelectorAll(".display-on-pitch")
+              .forEach((el) => el.classList.remove("display-on-pitch"));
+            document
+              .querySelector(".scroll-on-pitch")
+              ?.scrollIntoView({ behavior: "smooth" });
+          }
+
+          /* ─── VSL View: polling até 5 s pelo cookie ────────────── */
+          window.addEventListener("DOMContentLoaded", () => {
+            let tries = 0;
+            const int = setInterval(() => {
+              if (getCookie("rtkclickid-store")) {
+                track("VSL View");
+                clearInterval(int);
+              } else if (++tries >= 17) {
+                clearInterval(int);
+                console.warn(
+                  "VSL View não disparado: cookie não apareceu em 5 s."
+                );
+              }
+            }, 300);
+
+            if (localStorage.getItem("pitchView") === "true") {
+              displayOnPitch();
+            }
+          });
+
+          /* ─── Mensagens do SmartPlayer ─────────────────────────── */
+          window.addEventListener("message", (ev) => {
+            switch (ev.data) {
+              /* REMOVIDO: 'VSL View' duplicado */
+
+              case "VSL - Lead View":
+                track("VSL - Lead View");
+                break;
+
+              case "VSL - Play":
+                track("VSL - Play");
+                document
+                  .querySelectorAll(".hide-on-play")
+                  .forEach((el) => (el.style.display = "none"));
+                break;
+
+              case "VSL - 3 View":
+                track("VSL - 3 View");
+                break;
+              case "VSL - 60 View":
+                track("VSL - 60 View");
+                break;
+              case "VSL - 120 View":
+                track("VSL - 120 View");
+                break;
+              case "VSL - 300 View":
+                track("VSL - 300 View");
+                break;
+
+              case "VSL - Pitch View":
+                localStorage.setItem("pitchView", "true");
+                track("VSL - Pitch View");
+                displayOnPitch();
+                break;
+            }
+          });
+        })();
+      </script>
+      <!-- ====== /TRACKING ======================================================= -->
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
-    <!-- <script src="js/main.js"></script> -->
+    <script src="js/main.js"></script>
   </body>
 </html>
